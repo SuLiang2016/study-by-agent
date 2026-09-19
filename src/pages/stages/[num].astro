@@ -2,7 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ResourceCard from '../../components/ResourceCard.astro';
 import { url } from '../../lib/site';
-import { resourceById, stages, type Stage } from '../../lib/data';
+import { resourceById, pathIdsByStage, stages, type Stage } from '../../lib/data';
 import { progressPayload } from '../../lib/progress';
 
 export function getStaticPaths() {
@@ -22,7 +22,7 @@ const stepHints: Record<string, string> = {
   '二选一': '以下二选一即可',
 };
 
-const stepIds = stage.steps.flatMap((step) => step.ids);
+const stepIds = pathIdsByStage[String(stage.num)];
 const stageIndex = stages.findIndex((s) => s.num === stage.num);
 const prevStage = stageIndex > 0 ? stages[stageIndex - 1] : null;
 const nextStage = stageIndex < stages.length - 1 ? stages[stageIndex + 1] : null;

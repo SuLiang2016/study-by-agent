@@ -257,9 +257,9 @@ svg {
   white-space: nowrap;
 }
 
-.badge-stage.stage-1 { color: var(--s1); background: var(--s1-bg); }
-.badge-stage.stage-2 { color: var(--s2); background: var(--s2-bg); }
-.badge-stage.stage-3 { color: var(--s3); background: var(--s3-bg); }
+.badge-stage.stage-1, .stage-chip.stage-1 { color: var(--s1); background: var(--s1-bg); }
+.badge-stage.stage-2, .stage-chip.stage-2 { color: var(--s2); background: var(--s2-bg); }
+.badge-stage.stage-3, .stage-chip.stage-3 { color: var(--s3); background: var(--s3-bg); }
 
 .badge-maint.maint-active { color: var(--ok); background: var(--ok-bg); }
 .badge-maint.maint-stable { color: var(--info); background: var(--info-bg); }
@@ -847,10 +847,6 @@ svg {
   font-size: 0.78rem;
   font-weight: 700;
 }
-
-.stage-chip.stage-1 { color: var(--s1); background: var(--s1-bg); }
-.stage-chip.stage-2 { color: var(--s2); background: var(--s2-bg); }
-.stage-chip.stage-3 { color: var(--s3); background: var(--s3-bg); }
 
 .stage-card .duration {
   font-size: 0.8rem;
