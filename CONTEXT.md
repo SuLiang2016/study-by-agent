@@ -29,6 +29,10 @@ _Avoid_: 黑名单、废弃列表
 **方法论页 (Methodology Page)**:
 说明资源核实方式、维护状态判定标准与指南使用建议的页面。
 
+**指南核实日 (Guide Verified Date)**:
+调研指南本身（研究文档）经 GitHub API 核实的日期，是历史事实，固定不变，不随数据刷新推进。页脚、README 与方法论页引用的是它。
+_Avoid_: 核实日期（快照日）、更新日期
+
 ### 资源属性
 
 **资源类型 (Resource Type)**:
@@ -40,8 +44,8 @@ _Avoid_: 格式、平台
 _Avoid_: 更新状态、健康度、放缓
 
 **核实日期 (Verified Date)**:
-star 数与维护状态经 GitHub API 核实的快照日期（当前为 2026-09-11）。展示数据时必须随附此日期。
-_Avoid_: 更新时间、抓取时间
+star 数与维护状态最近一次经 GitHub API 逐一核实的快照日期，随每次数据刷新推进。展示数据时必须随附此日期。
+_Avoid_: 更新时间、抓取时间、指南核实日
 
 **主线框架 (Main Framework)**:
 阶段 2 中二选一深挖的框架（LangGraph 或 OpenAI Agents SDK），其余框架均按需选学。
