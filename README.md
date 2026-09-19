@@ -20,6 +20,7 @@
 | `npm run build` | 构建到 `dist/` |
 | `npm run preview` | 本地预览构建产物 |
 | `npm run refresh:stars` | 刷新 GitHub star / 推送时间 / 核实日期（详见方法论页） |
+| `npm test` | 回归测试（刷新脚本行为、数据合法性） |
 
 ## 目录结构
 

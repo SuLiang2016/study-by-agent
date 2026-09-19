@@ -5,7 +5,10 @@
 // 运行结束后会把「推送超过 3 个月」和「API 404」的仓库列出来提醒。
 import { readFileSync, writeFileSync } from 'node:fs';
 
-const DATA_URL = new URL('../src/data/resources.json', import.meta.url);
+// 数据文件路径可作为参数传入（测试用临时文件），默认写回真实数据
+const DATA_URL = process.argv[2]
+  ? new URL(`file://${process.argv[2].replace(/\\/g, '/')}`)
+  : new URL('../src/data/resources.json', import.meta.url);
 const MONTH_MS = 30 * 24 * 60 * 60 * 1000;
 const today = new Date().toISOString().slice(0, 10);
 
@@ -41,23 +44,30 @@ for (const r of repos) {
   }
 
   const j = await res.json();
+  // API 返回的 pushed_at 是 ISO 字符串，需先转 Date
+  const pushedAtMs = new Date(j.pushed_at).getTime();
   r.stars = j.stargazers_count;
   r.language = j.language;
   r.pushedAt = j.pushed_at.slice(0, 10);
   r.verifiedAt = today;
   updated.push(r);
 
-  const ageMonths = Math.round((Date.now() - j.pushed_at.getTime()) / MONTH_MS);
+  // 与 3 个月的比较必须用原始浮点值：先舍入会把 3.0~3.5 个月误判为未超期；只在显示时取整
+  const ageMonths = (Date.now() - pushedAtMs) / MONTH_MS;
   if (ageMonths > 3) {
-    stale.push(`${slug}（${ageMonths} 个月未推送，当前标记：${r.maintenance ?? '—'}）`);
+    stale.push(`${slug}（${Math.round(ageMonths)} 个月未推送，当前标记：${r.maintenance ?? '—'}）`);
   }
   console.log(`★ ${j.stargazers_count.toLocaleString('en-US')} · 推送 ${r.pushedAt}`);
 }
 
-data.verifiedAt = today;
+// 顶层 verifiedAt 描述「最近一次完整核实」的快照日期：只有全部仓库都核实成功才推进，
+// 否则部分失败的条目还留着旧数据，顶层日期先行会自相矛盾
+if (!notFound.length) {
+  data.verifiedAt = today;
+}
 writeFileSync(DATA_URL, JSON.stringify(data, null, 2) + '\n');
 
-console.log(`\n完成：更新 ${updated.length} 个仓库，核实日期 → ${today}`);
+console.log(`\n完成：更新 ${updated.length} 个仓库${notFound.length ? '' : `，核实日期 → ${today}`}`);
 if (notFound.length) {
   console.log(`\n⚠ 以下仓库已 404，请人工移入 deprecated.json：\n  ${notFound.join('\n  ')}`);
 }

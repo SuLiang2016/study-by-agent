@@ -1,7 +1,7 @@
 import resourcesJson from '../data/resources.json';
 import stagesJson from '../data/stages.json';
 import deprecatedJson from '../data/deprecated.json';
-import type { Resource } from './types';
+import { CATEGORIES, TYPE_LABEL, MAINTENANCE_LABEL, type Resource } from './types';
 
 export interface StageStep {
   order: string;
@@ -30,16 +30,35 @@ export const resourcesData = resourcesJson as { verifiedAt: string; resources: R
 export const resources = resourcesData.resources;
 export const verifiedAt = resourcesData.verifiedAt;
 
+// 构建时校验数据合法性：枚举字段写错会在 build/dev 立刻报错，而不是静默漏筛
+const VALID_STAGES = new Set([1, 2, 3]);
+for (const r of resources) {
+  if (!(r.type in TYPE_LABEL)) throw new Error(`资源 ${r.id} 的 type 非法：${r.type}`);
+  if (!CATEGORIES.includes(r.category)) throw new Error(`资源 ${r.id} 的 category 非法：${r.category}`);
+  if (r.maintenance !== null && !(r.maintenance in MAINTENANCE_LABEL)) {
+    throw new Error(`资源 ${r.id} 的 maintenance 非法：${r.maintenance}`);
+  }
+  if (!r.stages.length || !r.stages.every((s) => VALID_STAGES.has(s))) {
+    throw new Error(`资源 ${r.id} 的 stages 非法：${JSON.stringify(r.stages)}`);
+  }
+  // 与术语表一致：GitHub 仓库必有 star 数，非仓库类型必无
+  if ((r.type === 'repo') !== (r.stars !== null)) {
+    throw new Error(`资源 ${r.id} 的 stars 与 type 不一致：type=${r.type}, stars=${r.stars}`);
+  }
+}
+
 export const stagesData = stagesJson as { stages: Stage[] };
 export const stages = stagesData.stages;
 
 export const deprecatedData = deprecatedJson as { items: DeprecatedItem[] };
 
-export const resourceById = Object.fromEntries(resources.map((r) => [r.id, r])) as Record<string, Resource>;
+export const resourceById: Record<string, Resource> = Object.fromEntries(
+  resources.map((r) => [r.id, r]),
+);
 
 /** 每个阶段的学习路径资源 id 列表，供进度统计使用 */
-export const pathIdsByStage = Object.fromEntries(
+export const pathIdsByStage: Record<string, string[]> = Object.fromEntries(
   stages.map((s) => [String(s.num), s.steps.flatMap((step) => step.ids)]),
-) as Record<string, string[]>;
+);
 
 export const allPathIds = stages.flatMap((s) => s.steps.flatMap((step) => step.ids));

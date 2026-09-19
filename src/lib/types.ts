@@ -6,7 +6,7 @@ export interface Resource {
   name: string;
   url: string;
   type: ResourceType;
-  category: string;
+  category: Category;
   /** 建议阶段，可属于多个阶段 */
   stages: number[];
   /** 非 GitHub 资源为 null */
@@ -41,3 +41,5 @@ export const CATEGORIES = [
   '评测与可观测性',
   '官方文章与课程',
 ] as const;
+
+export type Category = (typeof CATEGORIES)[number];

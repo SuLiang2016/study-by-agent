@@ -1,5 +1,5 @@
 ---
-import type { Resource, Maintenance, ResourceType } from '../lib/types';
+import type { Resource } from '../lib/types';
 import { TYPE_LABEL, MAINTENANCE_LABEL } from '../lib/types';
 
 interface Props {
@@ -25,7 +25,7 @@ const { resource: r, order } = Astro.props;
     <h3 class="resource-name">
       <a href={r.url} target="_blank" rel="noopener noreferrer">{r.name}</a>
     </h3>
-    <span class="badge badge-type">{TYPE_LABEL[r.type as ResourceType]}</span>
+    <span class="badge badge-type">{TYPE_LABEL[r.type]}</span>
   </div>
 
   <p class="resource-note">{r.note}</p>
@@ -35,9 +35,11 @@ const { resource: r, order } = Astro.props;
       <span class={`badge badge-stage stage-${s}`}>阶段 {s}</span>
     ))}
     <span class={`badge badge-maint maint-${r.maintenance ?? 'none'}`} title={r.pushedAt ? `最近推送 ${r.pushedAt}` : undefined}>
-      {r.maintenance ? MAINTENANCE_LABEL[r.maintenance as Maintenance] : '—'}
+      {r.maintenance ? MAINTENANCE_LABEL[r.maintenance] : '—'}
     </span>
-    {r.stars != null && <span class="meta-item" title={`${r.stars.toLocaleString('en-US')} stars`}>★ {r.stars.toLocaleString('en-US')}</span>}
+    <span class="meta-item" title={r.stars != null ? `${r.stars.toLocaleString('en-US')} stars` : '非 GitHub 资源，无 star 数据'}>
+      ★ {r.stars != null ? r.stars.toLocaleString('en-US') : '—'}
+    </span>
     {r.language && <span class="meta-item">{r.language}</span>}
     <span class="meta-item">核实于 {r.verifiedAt}</span>
   </div>
