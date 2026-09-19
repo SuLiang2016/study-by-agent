@@ -1,6 +1,6 @@
 import { verifiedAt } from './data';
 
-/** 调研指南本身的核实日期：历史事实，不随数据刷新推进（区别于 resources.json 的 verifiedAt 快照日） */
+/** 指南核实日：调研指南本身经核实的日期，历史事实，固定不变（区别于 resources.json 的 verifiedAt 快照日） */
 export const GUIDE_VERIFIED_AT = '2026-09-11';
 
 export const SITE = {
