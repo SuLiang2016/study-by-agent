@@ -3,6 +3,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import ResourceCard from '../../components/ResourceCard.astro';
 import { url } from '../../lib/site';
 import { resourceById, stages, type Stage } from '../../lib/data';
+import { progressPayload } from '../../lib/progress';
 
 export function getStaticPaths() {
   return stages.map((stage) => ({
@@ -90,6 +91,6 @@ const nextStage = stageIndex < stages.length - 1 ? stages[stageIndex + 1] : null
   <script
     type="application/json"
     id="path-ids"
-    set:html={JSON.stringify({ byStage: { [String(stage.num)]: stepIds }, all: stepIds })}
+    set:html={progressPayload({ byStage: { [String(stage.num)]: stepIds }, all: stepIds })}
   />
 </BaseLayout>

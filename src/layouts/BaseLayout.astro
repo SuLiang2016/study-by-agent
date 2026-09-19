@@ -103,73 +103,8 @@ const pathname = Astro.url.pathname;
     </script>
 
     <script>
-      // 学习进度：localStorage 共享于全站，勾选状态实时反映到进度条
-      const PROGRESS_KEY = 'progress';
-
-      const loadProgress = (): Set<string> => {
-        try {
-          return new Set(JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]'));
-        } catch {
-          return new Set();
-        }
-      };
-
-      const saveProgress = (ids: Set<string>) => {
-        localStorage.setItem(PROGRESS_KEY, JSON.stringify([...ids]));
-      };
-
-      function refresh() {
-        const done = loadProgress();
-
-        document.querySelectorAll<HTMLElement>('[data-progress-toggle]').forEach((btn) => {
-          const isDone = done.has(btn.dataset.id!);
-          btn.classList.toggle('is-done', isDone);
-          btn.setAttribute('aria-pressed', String(isDone));
-          const label = btn.querySelector<HTMLElement>('[data-progress-label]');
-          if (label) label.textContent = isDone ? '已学' : '标记已学';
-        });
-
-        const payloadEl = document.getElementById('path-ids');
-        if (payloadEl?.textContent) {
-          const { byStage, all } = JSON.parse(payloadEl.textContent) as {
-            byStage: Record<string, string[]>;
-            all: string[];
-          };
-          const idsFor = (stage?: string) => (stage === 'all' ? all : (stage && byStage[stage]) || []);
-          const countIn = (ids: string[]) => ids.filter((id) => done.has(id)).length;
-
-          document.querySelectorAll<HTMLElement>('[data-progress-count]').forEach((el) => {
-            const ids = idsFor(el.dataset.stage);
-            el.textContent = `${countIn(ids)}/${ids.length}`;
-          });
-          document.querySelectorAll<HTMLElement>('[data-progress-bar]').forEach((el) => {
-            const ids = idsFor(el.dataset.stage);
-            const fill = el.querySelector<HTMLElement>('i');
-            if (fill) fill.style.width = ids.length ? `${(countIn(ids) / ids.length) * 100}%` : '0%';
-          });
-        }
-      }
-
-      document.addEventListener('click', (e) => {
-        const toggle = (e.target as HTMLElement).closest<HTMLElement>('[data-progress-toggle]');
-        if (toggle) {
-          const done = loadProgress();
-          const id = toggle.dataset.id!;
-          if (done.has(id)) done.delete(id);
-          else done.add(id);
-          saveProgress(done);
-          refresh();
-          return;
-        }
-        if ((e.target as HTMLElement).closest('[data-progress-reset]')) {
-          if (confirm('确定清空全部学习进度吗？')) {
-            localStorage.removeItem(PROGRESS_KEY);
-            refresh();
-          }
-        }
-      });
-
-      refresh();
+      import { initProgress } from '../lib/progress';
+      initProgress();
     </script>
   </body>
 </html>

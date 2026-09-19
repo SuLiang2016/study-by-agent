@@ -2,9 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { SITE, url } from '../lib/site';
 import { resources, stages, pathIdsByStage, allPathIds, verifiedAt } from '../lib/data';
-
-const byStage = pathIdsByStage;
-const pathIds = allPathIds;
+import { progressPayload } from '../lib/progress';
 
 const tips = [
   { title: '先走路径，再查资源库', desc: '学习路径是主体，资源库按需取用，不必从头到尾刷完。' },
@@ -81,5 +79,5 @@ const tips = [
     </a>
   </div>
 
-  <script type="application/json" id="path-ids" set:html={JSON.stringify({ byStage, all: pathIds })} />
+  <script type="application/json" id="path-ids" set:html={progressPayload({ byStage: pathIdsByStage, all: allPathIds })} />
 </BaseLayout>

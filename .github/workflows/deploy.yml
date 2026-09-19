@@ -20,6 +20,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      # 测试直接 import .ts（类型剥离），需 Node ≥ 22.18，故显式固定版本
+      - name: Setup Node for tests
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install dependencies
+        run: npm ci
+      - name: Run tests
+        run: npm test
       - name: Install, build, and upload site
         uses: withastro/action@v3
 
