@@ -49,7 +49,7 @@ const report = await refreshCore(data, createGitHubFetchRepo(), today, (event) =
 
 writeFileSync(DATA_URL, JSON.stringify(report.data, null, 2) + '\n');
 
-const { updated, notFound, skipped, stale } = report;
+const { updated, notFound, stale } = report;
 console.log(`\n完成：更新 ${updated.length} 个仓库${notFound.length ? '' : `，核实日期 → ${today}`}`);
 if (notFound.length) {
   console.log(`\n⚠ 以下仓库已 404，请人工移入 deprecated.json：\n  ${notFound.join('\n  ')}`);

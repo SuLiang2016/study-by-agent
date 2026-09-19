@@ -7,6 +7,8 @@ interface Props {
   description?: string;
   /** markdown 页面传入 prose: true，正文按文章排版（宽度约束 + 表格样式） */
   prose?: boolean;
+  /** markdown 页面的元数据可能整体挂在这个属性上（Astro 对 .md 页面的传递形状） */
+  frontmatter?: { title?: string; description?: string; prose?: boolean };
 }
 
 // markdown 页面的 frontmatter 可能整体挂在 frontmatter 属性上，也可能被展开，两者都兼容
