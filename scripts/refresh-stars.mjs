@@ -9,7 +9,8 @@ import { refreshCore } from '../src/lib/refresh.ts';
 const DATA_URL = process.argv[2]
   ? new URL(`file://${process.argv[2].replace(/\\/g, '/')}`)
   : new URL('../src/data/resources.json', import.meta.url);
-const today = new Date().toISOString().slice(0, 10);
+// 快照日取本地日历日：toISOString 是 UTC，本地凌晨（0~8 点）运行会写成前一天
+const today = new Date().toLocaleDateString('sv-SE');
 
 // 真 adapter：GitHub REST API 形状（stargazers_count / pushed_at ISO 串 / 限流头）在此翻译为领域字段
 function createGitHubFetchRepo() {
