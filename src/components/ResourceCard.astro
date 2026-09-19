@@ -1,6 +1,7 @@
 ---
 import type { Resource } from '../lib/types';
-import { TYPE_LABEL, MAINTENANCE_LABEL } from '../lib/types';
+import { TYPE_LABEL } from '../lib/types';
+import { maintenanceDisplay } from '../lib/maintenance';
 
 interface Props {
   resource: Resource;
@@ -9,6 +10,7 @@ interface Props {
 }
 
 const { resource: r, order } = Astro.props;
+const maint = maintenanceDisplay(r.maintenance);
 ---
 
 <article
@@ -18,7 +20,7 @@ const { resource: r, order } = Astro.props;
   data-stages={r.stages.join(',')}
   data-category={r.category}
   data-type={r.type}
-  data-maintenance={r.maintenance ?? 'none'}
+  data-maintenance={maint.key}
 >
   <div class="resource-head">
     {order && <span class="order-chip" aria-label={`顺序 ${order}`}>{order}</span>}
@@ -34,8 +36,8 @@ const { resource: r, order } = Astro.props;
     {r.stages.map((s) => (
       <span class={`badge badge-stage stage-${s}`}>阶段 {s}</span>
     ))}
-    <span class={`badge badge-maint maint-${r.maintenance ?? 'none'}`} title={r.pushedAt ? `最近推送 ${r.pushedAt}` : undefined}>
-      {r.maintenance ? MAINTENANCE_LABEL[r.maintenance] : '—'}
+    <span class={`badge badge-maint ${maint.className}`} title={r.pushedAt ? `最近推送 ${r.pushedAt}` : undefined}>
+      {maint.label}
     </span>
     <span class="meta-item" title={r.stars != null ? `${r.stars.toLocaleString('en-US')} stars` : '非 GitHub 资源，无 star 数据'}>
       ★ {r.stars != null ? r.stars.toLocaleString('en-US') : '—'}

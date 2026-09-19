@@ -4,6 +4,7 @@
 // 注意：本脚本只更新机械数据；维护状态分级、是否被取代需要人工复核——
 // 运行结束后会把「推送超过 3 个月」和「API 404」的仓库列出来提醒。
 import { readFileSync, writeFileSync } from 'node:fs';
+import { suggestMaintenance } from '../src/lib/maintenance.ts';
 
 // 数据文件路径可作为参数传入（测试用临时文件），默认写回真实数据
 const DATA_URL = process.argv[2]
@@ -55,7 +56,8 @@ for (const r of repos) {
   // 与 3 个月的比较必须用原始浮点值：先舍入会把 3.0~3.5 个月误判为未超期；只在显示时取整
   const ageMonths = (Date.now() - pushedAtMs) / MONTH_MS;
   if (ageMonths > 3) {
-    stale.push(`${slug}（${Math.round(ageMonths)} 个月未推送，当前标记：${r.maintenance ?? '—'}）`);
+    const suggest = suggestMaintenance(r.pushedAt, today);
+    stale.push(`${slug}（${Math.round(ageMonths)} 个月未推送，当前标记：${r.maintenance ?? '—'}，建议标记：${suggest ?? '需人工判定'}）`);
   }
   console.log(`★ ${j.stargazers_count.toLocaleString('en-US')} · 推送 ${r.pushedAt}`);
 }

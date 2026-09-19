@@ -3,7 +3,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import ResourceCard from '../components/ResourceCard.astro';
 import { url } from '../lib/site';
 import { resources, verifiedAt } from '../lib/data';
-import { CATEGORIES, TYPE_LABEL, MAINTENANCE_LABEL } from '../lib/types';
+import { CATEGORIES, TYPE_LABEL } from '../lib/types';
+import { MAINTENANCE_FILTER_OPTIONS } from '../lib/maintenance';
 ---
 
 <BaseLayout title="资源库" description="全部 AI Agent 学习资源汇总，可按阶段、类别、类型、维护状态筛选。">
@@ -45,10 +46,9 @@ import { CATEGORIES, TYPE_LABEL, MAINTENANCE_LABEL } from '../lib/types';
       <label for="f-maintenance">维护状态</label>
       <select id="f-maintenance" data-filter="maintenance">
         <option value="any">全部</option>
-        {Object.entries(MAINTENANCE_LABEL).map(([value, label]) => (
+        {MAINTENANCE_FILTER_OPTIONS.map(({ value, label }) => (
           <option value={value}>{label}</option>
         ))}
-        <option value="none">—（非仓库）</option>
       </select>
     </div>
     <div class="filter-meta">

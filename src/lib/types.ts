@@ -25,13 +25,6 @@ export const TYPE_LABEL: Record<ResourceType, string> = {
   pdf: 'PDF',
 };
 
-export const MAINTENANCE_LABEL: Record<Maintenance, string> = {
-  active: '活跃',
-  stable: '内容稳定',
-  slowing: '更新放缓',
-  shifted: '重心已转移',
-};
-
 export const CATEGORIES = [
   '系统课程',
   '清单与路线图',

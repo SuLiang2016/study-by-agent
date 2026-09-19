@@ -1,7 +1,8 @@
 import resourcesJson from '../data/resources.json';
 import stagesJson from '../data/stages.json';
 import deprecatedJson from '../data/deprecated.json';
-import { CATEGORIES, TYPE_LABEL, MAINTENANCE_LABEL, type Resource } from './types';
+import { CATEGORIES, TYPE_LABEL, type Resource } from './types';
+import { MAINTENANCE_LABEL } from './maintenance';
 
 export interface StageStep {
   order: string;
