@@ -1,0 +1,54 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { url } from '../lib/site';
+import { deprecatedData } from '../lib/data';
+
+const statusClass: Record<string, string> = {
+  '已被取代': 'badge-status-replaced',
+  '维护明显放缓': 'badge-status-slowing',
+  '已不存在': 'badge-status-gone',
+};
+---
+
+<BaseLayout
+  title="甄别清单"
+  description="已被取代或停止维护的 AI Agent 学习资源，学习前先避坑。"
+>
+  <div class="page-head">
+    <h1>甄别清单</h1>
+    <p class="page-desc">
+      AI Agent 框架更迭极快，搜索教程时容易撞上过时资源。以下资源已被取代或停止维护，
+      <strong>不进入学习路径与资源库</strong>；若旧教程指向它们，请顺着替代品学习。
+    </p>
+  </div>
+
+  {deprecatedData.items.map((item) => (
+    <article class="card deprecated-item">
+      <div class="deprecated-head">
+        <h3>{item.name}</h3>
+        <span class={`badge ${statusClass[item.status] ?? 'badge-status-gone'}`}>{item.status}</span>
+      </div>
+      <p class="resource-note">{item.detail}</p>
+      <ul class="evidence-list">
+        {item.evidence.map((ev) => (
+          <li>
+            依据：
+            {ev.url ? (
+              <a href={ev.url} target="_blank" rel="noopener noreferrer">{ev.label}</a>
+            ) : (
+              <span>{ev.label}</span>
+            )}
+          </li>
+        ))}
+      </ul>
+    </article>
+  ))}
+
+  <aside class="callout">
+    <p class="callout-title">发现新的过时资源？</p>
+    <p>
+      判定标准与核实方式见<a href={url('/methodology/')}>方法论页</a>；
+      若确认某资源已被取代，欢迎在 GitHub 仓库提 issue 补充依据。
+    </p>
+  </aside>
+</BaseLayout>

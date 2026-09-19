@@ -1,0 +1,95 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ResourceCard from '../../components/ResourceCard.astro';
+import { url } from '../../lib/site';
+import { resourceById, stages, type Stage } from '../../lib/data';
+
+export function getStaticPaths() {
+  return stages.map((stage) => ({
+    params: { num: String(stage.num) },
+    props: { stage },
+  }));
+}
+
+const { stage } = Astro.props as { stage: Stage };
+
+const stepHints: Record<string, string> = {
+  '可选': '选读材料，不强制',
+  '按需': '按需选学，用到再看',
+  '找灵感': '项目灵感库，改造一个感兴趣的',
+  '主线 · 二选一深挖': '以下二选一，深挖其中一个即可',
+  '二选一': '以下二选一即可',
+};
+
+const stepIds = stage.steps.flatMap((step) => step.ids);
+const stageIndex = stages.findIndex((s) => s.num === stage.num);
+const prevStage = stageIndex > 0 ? stages[stageIndex - 1] : null;
+const nextStage = stageIndex < stages.length - 1 ? stages[stageIndex + 1] : null;
+---
+
+<BaseLayout title={`阶段 ${stage.num} · ${stage.title}`} description={stage.goal}>
+  <div class="page-head">
+    <p><a href={url('/')}>← 返回学习路径</a></p>
+    <h1>
+      <span class={`stage-chip stage-${stage.num}`}>阶段 {stage.num}</span>
+      {stage.title}
+    </h1>
+    <p class="page-desc">
+      <strong>目标：</strong>{stage.goal}
+    </p>
+    <p class="step-hint">
+      预计时长：{stage.duration} · 路径资源 {stepIds.length} 条 ·
+      <span class="progress-count" data-progress-count data-stage={String(stage.num)}>…</span> 已学
+    </p>
+  </div>
+
+  <ol class="path-steps">
+    {stage.steps.map((step) => (
+      <li class="path-step">
+        <div class="step-head">
+          <span class="order-chip">{step.order}</span>
+          {step.badge && <span class="badge badge-flag">{step.badge}</span>}
+          {step.badge && stepHints[step.badge] && <span class="step-hint">{stepHints[step.badge]}</span>}
+        </div>
+        <div class={`step-cards ${step.ids.length > 1 ? 'cols-2' : ''}`}>
+          {step.ids.map((id) => (
+            <ResourceCard resource={resourceById[id]} />
+          ))}
+        </div>
+      </li>
+    ))}
+  </ol>
+
+  <aside class="callout">
+    <p class="callout-title">为什么是这个顺序</p>
+    <p>{stage.rationale}</p>
+  </aside>
+
+  <nav class="stage-pager" aria-label="阶段切换">
+    {prevStage ? (
+      <a href={url(`/stages/${prevStage.num}/`)}>
+        <span class="pager-label">← 上一阶段</span>
+        <span class="pager-title">阶段 {prevStage.num} · {prevStage.title}</span>
+      </a>
+    ) : (
+      <span></span>
+    )}
+    {nextStage ? (
+      <a class="pager-next" href={url(`/stages/${nextStage.num}/`)}>
+        <span class="pager-label">下一阶段 →</span>
+        <span class="pager-title">阶段 {nextStage.num} · {nextStage.title}</span>
+      </a>
+    ) : (
+      <a class="pager-next" href={url('/catalog/')}>
+        <span class="pager-label">继续 →</span>
+        <span class="pager-title">资源库：按需检索全部资源</span>
+      </a>
+    )}
+  </nav>
+
+  <script
+    type="application/json"
+    id="path-ids"
+    set:html={JSON.stringify({ byStage: { [String(stage.num)]: stepIds }, all: stepIds })}
+  />
+</BaseLayout>

@@ -1,0 +1,49 @@
+---
+import type { Resource, Maintenance, ResourceType } from '../lib/types';
+import { TYPE_LABEL, MAINTENANCE_LABEL } from '../lib/types';
+
+interface Props {
+  resource: Resource;
+  /** 路径步骤序号（①②…），仅阶段页使用 */
+  order?: string;
+}
+
+const { resource: r, order } = Astro.props;
+---
+
+<article
+  class="card resource-card"
+  data-resource-card
+  data-id={r.id}
+  data-stages={r.stages.join(',')}
+  data-category={r.category}
+  data-type={r.type}
+  data-maintenance={r.maintenance ?? 'none'}
+>
+  <div class="resource-head">
+    {order && <span class="order-chip" aria-label={`顺序 ${order}`}>{order}</span>}
+    <h3 class="resource-name">
+      <a href={r.url} target="_blank" rel="noopener noreferrer">{r.name}</a>
+    </h3>
+    <span class="badge badge-type">{TYPE_LABEL[r.type as ResourceType]}</span>
+  </div>
+
+  <p class="resource-note">{r.note}</p>
+
+  <div class="resource-meta">
+    {r.stages.map((s) => (
+      <span class={`badge badge-stage stage-${s}`}>阶段 {s}</span>
+    ))}
+    <span class={`badge badge-maint maint-${r.maintenance ?? 'none'}`} title={r.pushedAt ? `最近推送 ${r.pushedAt}` : undefined}>
+      {r.maintenance ? MAINTENANCE_LABEL[r.maintenance as Maintenance] : '—'}
+    </span>
+    {r.stars != null && <span class="meta-item" title={`${r.stars.toLocaleString('en-US')} stars`}>★ {r.stars.toLocaleString('en-US')}</span>}
+    {r.language && <span class="meta-item">{r.language}</span>}
+    <span class="meta-item">核实于 {r.verifiedAt}</span>
+  </div>
+
+  <button class="done-toggle" type="button" data-progress-toggle data-id={r.id} aria-pressed="false">
+    <span class="tick" aria-hidden="true">✓</span>
+    <span data-progress-label>标记已学</span>
+  </button>
+</article>

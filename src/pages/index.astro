@@ -1,0 +1,85 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE, url } from '../lib/site';
+import { resources, stages, pathIdsByStage, allPathIds, verifiedAt } from '../lib/data';
+
+const byStage = pathIdsByStage;
+const pathIds = allPathIds;
+
+const tips = [
+  { title: '先走路径，再查清单', desc: '学习路径是主体，资源库按需取用，不必从头到尾刷完。' },
+  { title: '不要试图学完所有框架', desc: '深入一个框架，理解所有框架共同的模式：工具调用、上下文管理、编排、评测。' },
+  { title: '警惕过时资源', desc: 'AI Agent 框架更迭极快，学习前先查「甄别清单」，避开已被取代的项目。' },
+  { title: '动手优先', desc: '读 10 篇文章不如写 1 个能跑的 Agent，每个阶段都配了可直接运行的代码仓库。' },
+];
+---
+
+<BaseLayout>
+  <section class="hero">
+    <p class="hero-kicker">{SITE.subtitle}</p>
+    <h1>{SITE.title}</h1>
+    <p class="hero-lead">
+      一条三阶段学习路径 + 一份可筛选的资源库。所有 GitHub 仓库均于
+      {verifiedAt} 通过 GitHub API 逐一核实 star 数与维护状态，过时资源单独甄别。
+    </p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href={url('/stages/1/')}>从阶段 1 开始 →</a>
+      <a class="btn" href={url('/catalog/')}>浏览资源库</a>
+    </div>
+  </section>
+
+  <section class="card progress-panel" aria-label="学习进度">
+    <span class="panel-label">学习进度</span>
+    <span class="progress-line">
+      <span class="progress-bar" data-progress-bar data-stage="all"><i></i></span>
+      <span class="progress-count" data-progress-count data-stage="all">…</span>
+    </span>
+    <button class="btn btn-small" type="button" data-progress-reset>清空进度</button>
+  </section>
+
+  <h2 class="section-title">学习路径</h2>
+  <div class="stage-grid">
+    {stages.map((s) => (
+      <a class="card stage-card" href={url(`/stages/${s.num}/`)}>
+        <div class="stage-card-head">
+          <span class={`stage-chip stage-${s.num}`}>阶段 {s.num}</span>
+          <span class="duration">{s.duration}</span>
+        </div>
+        <h3>{s.title}</h3>
+        <p class="stage-goal">{s.goal}</p>
+        <span class="progress-line">
+          <span class="progress-bar" data-progress-bar data-stage={String(s.num)}><i></i></span>
+          <span class="progress-count" data-progress-count data-stage={String(s.num)}>…</span>
+        </span>
+      </a>
+    ))}
+  </div>
+
+  <h2 class="section-title">使用建议</h2>
+  <div class="tips-grid">
+    {tips.map((tip) => (
+      <div class="card tip-card">
+        <h3>{tip.title}</h3>
+        <p>{tip.desc}</p>
+      </div>
+    ))}
+  </div>
+
+  <h2 class="section-title">延伸入口</h2>
+  <div class="more-links">
+    <a class="card more-link" href={url('/catalog/')}>
+      <span class="more-title">资源库</span>
+      <span class="more-desc">全部 {resources.length} 条资源，按阶段 / 类别 / 类型 / 维护状态筛选</span>
+    </a>
+    <a class="card more-link" href={url('/deprecated/')}>
+      <span class="more-title">甄别清单</span>
+      <span class="more-desc">已被取代或停止维护的资源，学习前先避坑</span>
+    </a>
+    <a class="card more-link" href={url('/methodology/')}>
+      <span class="more-title">方法论</span>
+      <span class="more-desc">数据核实方式、维护状态判定标准与更新流程</span>
+    </a>
+  </div>
+
+  <script type="application/json" id="path-ids" set:html={JSON.stringify({ byStage, all: pathIds })} />
+</BaseLayout>

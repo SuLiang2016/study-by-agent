@@ -1,0 +1,175 @@
+---
+import '../styles/global.css';
+import { SITE, url } from '../lib/site';
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** markdown 页面传入 prose: true，正文按文章排版（宽度约束 + 表格样式） */
+  prose?: boolean;
+}
+
+// markdown 页面的 frontmatter 可能整体挂在 frontmatter 属性上，也可能被展开，两者都兼容
+const fm = Astro.props.frontmatter ?? {};
+const { title, description = SITE.description, prose = false } = { ...fm, ...Astro.props };
+const pageTitle = title ? `${title} · ${SITE.title}` : `${SITE.title} — ${SITE.subtitle}`;
+
+const nav = [
+  { href: url('/catalog/'), label: '资源库' },
+  { href: url('/deprecated/'), label: '甄别清单' },
+  { href: url('/methodology/'), label: '方法论' },
+];
+const pathname = Astro.url.pathname;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="generator" content={Astro.generator} />
+    <link rel="icon" type="image/svg+xml" href={url('/favicon.svg')} />
+    <title>{pageTitle}</title>
+    <script is:inline>
+      // 首屏前解析主题，避免闪白：默认跟随系统，localStorage 可覆盖
+      (() => {
+        const stored = localStorage.getItem('theme');
+        const theme =
+          stored === 'light' || stored === 'dark'
+            ? stored
+            : matchMedia('(prefers-color-scheme: dark)').matches
+              ? 'dark'
+              : 'light';
+        document.documentElement.dataset.theme = theme;
+        matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+          if (!localStorage.getItem('theme')) {
+            document.documentElement.dataset.theme = e.matches ? 'dark' : 'light';
+          }
+        });
+      })();
+    </script>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container">
+        <a class="brand" href={url('/')}>
+          {SITE.title}<span class="brand-sub">{SITE.subtitle}</span>
+        </a>
+        <nav class="site-nav" aria-label="站点导航">
+          {nav.map((item) => (
+            <a href={item.href} aria-current={pathname === item.href ? 'true' : undefined}>
+              {item.label}
+            </a>
+          ))}
+          <button id="theme-toggle" class="theme-toggle" type="button" aria-label="切换深浅色主题" title="切换深浅色主题">
+            <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="4"></circle>
+              <path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path>
+            </svg>
+            <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"></path>
+            </svg>
+          </button>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      {prose ? <div class="prose"><slot /></div> : <slot />}
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <span>整理自 2026-09-11 核实的调研指南 · star 数据为快照，可能过时</span>
+        <span>
+          <a href={url('/methodology/')}>数据方法论</a>
+          <span aria-hidden="true"> · </span>
+          <a href={SITE.repo} target="_blank" rel="noopener noreferrer">GitHub 仓库</a>
+          <span aria-hidden="true"> · </span>
+          <span>学习进度仅存于本浏览器</span>
+        </span>
+      </div>
+    </footer>
+
+    <script is:inline>
+      // 主题手动覆盖：点击切换并在 localStorage 记住选择
+      document.getElementById('theme-toggle')?.addEventListener('click', () => {
+        const root = document.documentElement;
+        const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+        root.dataset.theme = next;
+        localStorage.setItem('theme', next);
+      });
+    </script>
+
+    <script>
+      // 学习进度：localStorage 共享于全站，勾选状态实时反映到进度条
+      const PROGRESS_KEY = 'progress';
+
+      const loadProgress = (): Set<string> => {
+        try {
+          return new Set(JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]'));
+        } catch {
+          return new Set();
+        }
+      };
+
+      const saveProgress = (ids: Set<string>) => {
+        localStorage.setItem(PROGRESS_KEY, JSON.stringify([...ids]));
+      };
+
+      function refresh() {
+        const done = loadProgress();
+
+        document.querySelectorAll<HTMLElement>('[data-progress-toggle]').forEach((btn) => {
+          const isDone = done.has(btn.dataset.id!);
+          btn.classList.toggle('is-done', isDone);
+          btn.setAttribute('aria-pressed', String(isDone));
+          const label = btn.querySelector<HTMLElement>('[data-progress-label]');
+          if (label) label.textContent = isDone ? '已学' : '标记已学';
+        });
+
+        const payloadEl = document.getElementById('path-ids');
+        if (payloadEl?.textContent) {
+          const { byStage, all } = JSON.parse(payloadEl.textContent) as {
+            byStage: Record<string, string[]>;
+            all: string[];
+          };
+          const idsFor = (stage?: string) => (stage === 'all' ? all : (stage && byStage[stage]) || []);
+          const countIn = (ids: string[]) => ids.filter((id) => done.has(id)).length;
+
+          document.querySelectorAll<HTMLElement>('[data-progress-count]').forEach((el) => {
+            const ids = idsFor(el.dataset.stage);
+            el.textContent = `${countIn(ids)}/${ids.length}`;
+          });
+          document.querySelectorAll<HTMLElement>('[data-progress-bar]').forEach((el) => {
+            const ids = idsFor(el.dataset.stage);
+            const fill = el.querySelector<HTMLElement>('i');
+            if (fill) fill.style.width = ids.length ? `${(countIn(ids) / ids.length) * 100}%` : '0%';
+          });
+        }
+      }
+
+      document.addEventListener('click', (e) => {
+        const toggle = (e.target as HTMLElement).closest<HTMLElement>('[data-progress-toggle]');
+        if (toggle) {
+          const done = loadProgress();
+          const id = toggle.dataset.id!;
+          if (done.has(id)) done.delete(id);
+          else done.add(id);
+          saveProgress(done);
+          refresh();
+          return;
+        }
+        if ((e.target as HTMLElement).closest('[data-progress-reset]')) {
+          if (confirm('确定清空全部学习进度吗？')) {
+            localStorage.removeItem(PROGRESS_KEY);
+            refresh();
+          }
+        }
+      });
+
+      refresh();
+    </script>
+  </body>
+</html>

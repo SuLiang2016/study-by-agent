@@ -1,0 +1,48 @@
+{
+  "stages": [
+    {
+      "num": 1,
+      "title": "入门——建立心智模型",
+      "duration": "约 1~2 周",
+      "goal": "不写代码或少量代码，搞清楚 Agent 是什么、不是什么，掌握核心概念：工具调用 / tool use、ReAct 循环、工作流 vs 智能体、上下文管理。",
+      "steps": [
+        { "order": "①", "ids": ["anthropic-effective-agents"] },
+        { "order": "②", "ids": ["ai-agents-for-beginners"] },
+        { "order": "③", "ids": ["openai-agents-guide"], "badge": "可选" },
+        { "order": "④", "ids": ["berkeley-llm-agents-mooc"], "badge": "可选" },
+        { "order": "⑤", "ids": ["generative-ai-for-beginners"], "badge": "按需" }
+      ],
+      "rationale": "心智模型先行可以避免「工具先行」的陷阱——很多人上来就学某个框架，结果框架一换全部作废。Anthropic 的文章给了你与框架无关的模式语言，ai-agents-for-beginners 再把这些模式落到代码。"
+    },
+    {
+      "num": 2,
+      "title": "动手——用框架做出第一个能跑的 Agent",
+      "duration": "约 4~8 周",
+      "goal": "完整做出 2~3 个单智能体应用（带工具调用、RAG、记忆），理解每种框架共同的模式差异。",
+      "steps": [
+        { "order": "①", "ids": ["agents-course"] },
+        { "order": "②", "ids": ["langgraph", "openai-agents-python"], "badge": "主线 · 二选一深挖" },
+        { "order": "③", "ids": ["genai-agents"] },
+        { "order": "④", "ids": ["12-factor-agents"] },
+        { "order": "⑤", "ids": ["awesome-llm-apps"], "badge": "找灵感" },
+        { "order": "⑥", "ids": ["smolagents"], "badge": "按需" }
+      ],
+      "rationale": "先用结构化课程（HF）把三套框架都摸一遍，防止过早绑定；然后主线深挖一个框架做项目；GenAI_Agents 当习题集、awesome-llm-apps 当项目灵感库；12-factor-agents 放在框架学习之后读，效果最好——你已经有了对照物。"
+    },
+    {
+      "num": 3,
+      "title": "进阶——多智能体、协议、评测与生产化",
+      "duration": "持续",
+      "goal": "从 demo 走向产品：接入 MCP 生态、理解智能体互操作、建立评测与可观测性、掌握多智能体编排。",
+      "steps": [
+        { "order": "①", "ids": ["mcp-for-beginners"] },
+        { "order": "②", "ids": ["mcp-servers", "mcp-python-sdk"] },
+        { "order": "③", "ids": ["agents-towards-production"] },
+        { "order": "④", "ids": ["langfuse", "phoenix"], "badge": "二选一" },
+        { "order": "⑤", "ids": ["agent-framework", "crewai"], "badge": "按需" },
+        { "order": "⑥", "ids": ["adk-python", "a2a", "claude-agent-sdk-python"], "badge": "按需" }
+      ],
+      "rationale": "MCP / 评测 / 生产化是 2025-2026 年 Agent 工程化竞争的主战场，也是个人开发者做出「能用」而非「能演示」的产品的分水岭。多智能体编排放在最后——经验上单智能体 + 好工具能解决 80% 的问题，过早多智能体只会增加调试成本。"
+    }
+  ]
+}

@@ -1,0 +1,99 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ResourceCard from '../components/ResourceCard.astro';
+import { url } from '../lib/site';
+import { resources, verifiedAt } from '../lib/data';
+import { CATEGORIES, TYPE_LABEL, MAINTENANCE_LABEL } from '../lib/types';
+---
+
+<BaseLayout title="资源库" description="全部 AI Agent 学习资源汇总，可按阶段、类别、类型、维护状态筛选。">
+  <div class="page-head">
+    <h1>资源库</h1>
+    <p class="page-desc">
+      全部 {resources.length} 条资源（含非 GitHub 的官方文章与课程），与学习路径共用同一套数据。
+      star 数与维护状态为 {verifiedAt} 的快照，刷新方式见<a href={url('/methodology/')}>方法论</a>。
+    </p>
+  </div>
+
+  <div class="card filter-bar" role="search" aria-label="资源筛选">
+    <div class="filter-group">
+      <label for="f-stage">阶段</label>
+      <select id="f-stage" data-filter="stage">
+        <option value="any">全部</option>
+        <option value="1">阶段 1</option>
+        <option value="2">阶段 2</option>
+        <option value="3">阶段 3</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label for="f-category">类别</label>
+      <select id="f-category" data-filter="category">
+        <option value="any">全部</option>
+        {CATEGORIES.map((c) => <option value={c}>{c}</option>)}
+      </select>
+    </div>
+    <div class="filter-group">
+      <label for="f-type">类型</label>
+      <select id="f-type" data-filter="type">
+        <option value="any">全部</option>
+        {Object.entries(TYPE_LABEL).map(([value, label]) => (
+          <option value={value}>{label}</option>
+        ))}
+      </select>
+    </div>
+    <div class="filter-group">
+      <label for="f-maintenance">维护状态</label>
+      <select id="f-maintenance" data-filter="maintenance">
+        <option value="any">全部</option>
+        {Object.entries(MAINTENANCE_LABEL).map(([value, label]) => (
+          <option value={value}>{label}</option>
+        ))}
+        <option value="none">—（非仓库）</option>
+      </select>
+    </div>
+    <div class="filter-meta">
+      <span class="result-count">显示 <strong data-result-count>…</strong> 条</span>
+      <button class="btn btn-small" type="button" data-filter-reset>清除筛选</button>
+    </div>
+  </div>
+
+  <div class="resource-grid">
+    {resources.map((resource) => (
+      <ResourceCard resource={resource} />
+    ))}
+  </div>
+
+  <div class="empty-state" data-empty hidden>
+    <p>没有符合条件的资源——试试放宽筛选条件。</p>
+  </div>
+
+  <script>
+    const cards = [...document.querySelectorAll<HTMLElement>('[data-resource-card]')];
+    const selects = [...document.querySelectorAll<HTMLSelectElement>('[data-filter]')];
+    const countEl = document.querySelector<HTMLElement>('[data-result-count]');
+    const emptyEl = document.querySelector<HTMLElement>('[data-empty]');
+
+    function applyFilters() {
+      const filters = Object.fromEntries(selects.map((s) => [s.dataset.filter!, s.value]));
+      let shown = 0;
+      for (const card of cards) {
+        const visible =
+          (filters.stage === 'any' || card.dataset.stages!.split(',').includes(filters.stage)) &&
+          (filters.category === 'any' || card.dataset.category === filters.category) &&
+          (filters.type === 'any' || card.dataset.type === filters.type) &&
+          (filters.maintenance === 'any' || card.dataset.maintenance === filters.maintenance);
+        card.hidden = !visible;
+        if (visible) shown++;
+      }
+      if (countEl) countEl.textContent = String(shown);
+      if (emptyEl) emptyEl.hidden = shown !== 0;
+    }
+
+    selects.forEach((s) => s.addEventListener('change', applyFilters));
+    document.querySelector('[data-filter-reset]')?.addEventListener('click', () => {
+      selects.forEach((s) => (s.value = 'any'));
+      applyFilters();
+    });
+    applyFilters();
+  </script>
+</BaseLayout>
