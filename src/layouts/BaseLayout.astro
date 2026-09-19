@@ -1,6 +1,6 @@
 ---
 import '../styles/global.css';
-import { SITE, url } from '../lib/site';
+import { SITE, url, GUIDE_VERIFIED_AT } from '../lib/site';
 
 interface Props {
   title?: string;
@@ -81,7 +81,7 @@ const pathname = Astro.url.pathname;
 
     <footer class="site-footer">
       <div class="container">
-        <span>整理自 2026-09-11 核实的调研指南 · star 数据为快照，可能过时</span>
+        <span>整理自 {GUIDE_VERIFIED_AT} 核实的调研指南 · star 数据为快照，可能过时</span>
         <span>
           <a href={url('/methodology/')}>数据方法论</a>
           <span aria-hidden="true"> · </span>
